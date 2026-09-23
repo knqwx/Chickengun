@@ -55,6 +55,13 @@
         button:hover {
             background-color: #5b4bc4;
         }
+        /* Кнопка очистки */
+        .clear-btn {
+            background-color: #ff6b6b;
+        }
+        .clear-btn:hover {
+            background-color: #ee5253;
+        }
         .error {
             color: #ff6b6b;
             font-size: 14px;
@@ -91,9 +98,10 @@
         <div class="status-item">Текущий вопрос: <span id="currentQuestion">Ожидание...</span></div>
         <div class="status-item">Последние ответы пользователя:</div>
         <div id="answersList" style="max-height: 250px; overflow-y: auto;">
-            <!-- Сюда будут динамически падать ответы -->
             <div style="color: #777; font-size: 14px;">Пока нет данных...</div>
         </div>
+        <!-- Кнопка очистки -->
+        <button class="clear-btn" onclick="clearSession()">Очистить сессию</button>
     </div>
 
 <script>
@@ -109,9 +117,9 @@
     }
 
     function startListening() {
-        // Каждую секунду проверяем localStorage, что делает пользователь на сайте
+        // Каждую секунду проверяем localStorage
         setInterval(() => {
-            const currentQ = localStorage.getItem('admin_current_question') || 'Не запущен';
+            const currentQ = localStorage.getItem('admin_current_question') || 'Ожидание...';
             const answersData = JSON.parse(localStorage.getItem('admin_user_answers') || '{}');
 
             document.getElementById('currentQuestion').innerText = currentQ;
@@ -125,8 +133,20 @@
                     </div>`;
                 }
                 answersListContainer.innerHTML = html;
+            } else {
+                answersListContainer.innerHTML = '<div style="color: #777; font-size: 14px;">Пока нет данных...</div>';
             }
         }, 500);
+    }
+
+    function clearSession() {
+        // Удаляем данные сессии из памяти браузера
+        localStorage.removeItem('admin_current_question');
+        localStorage.removeItem('admin_user_answers');
+        
+        // Сразу обновляем интерфейс админки
+        document.getElementById('currentQuestion').innerText = 'Ожидание...';
+        document.getElementById('answersList').innerHTML = '<div style="color: #777; font-size: 14px;">Пока нет данных...</div>';
     }
 </script>
 

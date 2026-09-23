@@ -75,6 +75,12 @@
         .options label:hover {
             background: #3f3f63;
         }
+        .question-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
     </style>
 </head>
 <body>
@@ -159,29 +165,33 @@
     <div class="question-box" id="q9">
         <h2>√625?</h2>
         <input type="text" id="ans9" placeholder="Введите ответ...">
-        <button onclick="checkMath(9, '25', 'q10')">Далее</button>
+        <button onclick="nextStep('q10')">Далее</button>
     </div>
 
     <!-- Вопрос 10: Предыдущий ответ + 42 -->
     <div class="question-box" id="q10">
-        <h2>+42? (Предыдущий ответ + 42)</h2>
+        <h2>+42?</h2>
         <input type="text" id="ans10" placeholder="Введите ответ...">
-        <button onclick="checkMath(10, '67', 'q11')">Далее</button>
+        <button onclick="nextStep('q11')">Далее</button>
     </div>
 
-    <!-- Вопрос 11: Финал -->
+    <!-- Вопрос 11: Финал (душа) -->
     <div class="question-box" id="q11">
         <h2>Вы готовы продать свою душу чикен гану?</h2>
         <div class="options">
             <label><input type="radio" name="soul" value="да"> Да</label>
-            <label><input type="radio" name="soul" value="конечно"> Конечно да!</label>
         </div>
-        <button onclick="finish()">Отправить</button>
+        <button onclick="nextStep('q12')">Отправить</button>
     </div>
 
-    <!-- Экран успеха -->
-    <div class="question-box" id="success">
-        <h2>Поздравляем! Опрос успешно пройден, ваша душа официально принадлежит Чикен Гану! 🐔🦖</h2>
+    <!-- Вопрос 12: Последний вопрос с картинкой -->
+    <div class="question-box" id="q12">
+        <img src="Screenshot_20260923-145830.png" alt="Фото" class="question-image[span_0](start_span)"[span_0](end_span)>
+        <h2>Это вы?</h2>
+        <div class="options">
+            <label><input type="radio" name="final" onclick="return false;"> Да</label>
+            <label><input type="radio" name="final" onclick="return false;"> Нет</label>
+        </div>
     </div>
 </div>
 
@@ -206,47 +216,30 @@
             currentBoxElement.classList.remove('active');
             document.getElementById('q7').classList.add('active');
         } else {
-            // Если выбрано что-то другое (Standoff 2, Brawl Stars или Роблокс)
             const container = document.getElementById('mainContainer');
             
-            // 1. Прячем контейнер (блок с вопросом)
+            // 1. Прячем контейнер
             container.style.opacity = '0';
 
             setTimeout(() => {
-                // 2. Быстрое мигание черным и белым фоном страницы
+                // 2. Вспышка черного, затем белого с задержкой в 1 секунду
                 document.body.style.background = '#000000';
                 setTimeout(() => {
                     document.body.style.background = '#ffffff';
                     setTimeout(() => {
-                        document.body.style.background = '#1e1e2f'; // Возвращаем исходный градиент фона
-                        // Снимаем выбор с радиокнопок
-                        selected.checked = false;
-                        // 3. Возвращаем блок на место
-                        container.style.opacity = '1';
-                    }, 80);
+                        document.body.style.background = '#1e1e2f'; // Возвращаем фон
+                        selected.checked = false; // Снимаем выбор
+                        container.style.opacity = '1'; // Возвращаем блок
+                    }, 1000); // Держим белый цвет 1 секунду
                 }, 80);
             }, 200);
         }
     }
 
-    function checkMath(qNum, correctValue, nextId) {
-        const inputVal = document.getElementById(`ans${qNum}`).value.trim();
+    function nextStep(nextId) {
         const currentBoxElement = document.querySelector('.question-box.active');
-
-        if (inputVal === correctValue) {
-            currentBoxElement.classList.remove('active');
-            document.getElementById(nextId).classList.add('active');
-        }
-    }
-
-    function finish() {
-        const selected = document.querySelector('input[name="soul"]:checked');
-        const currentBoxElement = document.querySelector('.question-box.active');
-
-        if (selected) {
-            currentBoxElement.classList.remove('active');
-            document.getElementById('success').classList.add('active');
-        }
+        currentBoxElement.classList.remove('active');
+        document.getElementById(nextId).classList.add('active');
     }
 </script>
 

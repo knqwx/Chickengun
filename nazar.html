@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Web</title>
+    <title>web</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -14,7 +14,7 @@
             align-items: center;
             height: 100vh;
             margin: 0;
-            transition: background 0.1s; /* Плавный переход фона */
+            transition: background 0.1s;
         }
         .container {
             background: #252538;
@@ -24,7 +24,7 @@
             width: 100%;
             max-width: 450px;
             text-align: center;
-            transition: opacity 0.2s; /* Плавное исчезновение блока */
+            transition: opacity 0.2s;
         }
         .question-box {
             display: none;
@@ -43,6 +43,7 @@
             border-radius: 8px;
             border: none;
             font-size: 16px;
+            box-sizing: border-box;
         }
         button {
             background-color: #6c5ce7;
@@ -53,11 +54,14 @@
         button:hover {
             background-color: #5b4bc4;
         }
+        button:disabled {
+            background-color: #444;
+            cursor: not-allowed;
+        }
         input[type="text"] {
             background: #33334d;
             color: white;
             border: 1px solid #444466;
-            box-sizing: border-box;
         }
         .options {
             text-align: left;
@@ -131,7 +135,7 @@
         <button onclick="checkRadio('friend', 'динозавр', 'q6')">Далее</button>
     </div>
 
-    <!-- Вопрос 6: Любимая игра (ИЗМЕНЕНО) -->
+    <!-- Вопрос 6: Любимая игра -->
     <div class="question-box" id="q6">
         <h2>Ваша любимая игра?</h2>
         <div class="options">
@@ -140,7 +144,6 @@
             <label><input type="radio" name="game" value="brawl stars"> Brawl Stars</label>
             <label><input type="radio" name="game" value="роблокс"> Роблокс</label>
         </div>
-        <!-- Теперь кнопка вызывает функцию белого экрана и перехода -->
         <button onclick="triggerWhiteFlash('q7')">Далее</button>
     </div>
 
@@ -162,18 +165,18 @@
         <button onclick="checkRadio('eliminate', 'да', 'q9')">Далее</button>
     </div>
 
-    <!-- Вопрос 9: Корень из 625 -->
+    <!-- Вопрос 9: Корень из 625 (С ПРОВЕРКОЙ) -->
     <div class="question-box" id="q9">
         <h2>√625?</h2>
         <input type="text" id="ans9" placeholder="Введите ответ...">
-        <button onclick="nextStep('q10')">Далее</button>
+        <button onclick="checkMath('ans9', '25', 'q10')">Далее</button>
     </div>
 
-    <!-- Вопрос 10: Предыдущий ответ + 42 -->
+    <!-- Вопрос 10: +42 (С ПРОВЕРКОЙ) -->
     <div class="question-box" id="q10">
         <h2>+42?</h2>
         <input type="text" id="ans10" placeholder="Введите ответ...">
-        <button onclick="nextStep('q11')">Далее</button>
+        <button onclick="checkMath('ans10', '67', 'q11')">Далее</button>
     </div>
 
     <!-- Вопрос 11: Финал (душа) -->
@@ -182,22 +185,22 @@
         <div class="options">
             <label><input type="radio" name="soul" value="да"> Да</label>
         </div>
-        <button onclick="nextStep('q12')">Отправить</button>
+        <button onclick="checkRadio('soul', 'да', 'q12')">Отправить</button>
     </div>
 
-    <!-- Вопрос 12: Последний вопрос с картинкой -->
+    <!-- Вопрос 12: Последний вопрос (Картинка, Варианты Да/Да) -->
     <div class="question-box" id="q12">
         <img src="image.png" alt="Фото" class="question-image">
         <h2>Это вы?</h2>
         <div class="options">
-            <label><input type="radio" name="final" onclick="return false;"> Да</label>
-            <label><input type="radio" name="final" onclick="return false;"> Нет</label>
+            <label><input type="radio" name="final"> Да</label>
+            <label><input type="radio" name="final"> Да</label>
         </div>
     </div>
 </div>
 
 <script>
-    // Функция для вопросов с проверкой правильного ответа (как раньше)
+    // Функция для обычных вопросов с радиокнопками
     function checkRadio(groupName, correctValue, nextId) {
         const selected = document.querySelector(`input[name="${groupName}"]:checked`);
         const currentBoxElement = document.querySelector('.question-box.active');
@@ -208,39 +211,36 @@
         }
     }
 
-    // Новая функция для перехода к следующему шагу без проверки ответа (для вопросов с инпутами)
-    function nextStep(nextId) {
+    // Новая функция для проверки математических ответов
+    function checkMath(inputId, correctValue, nextId) {
+        const inputVal = document.getElementById(inputId).value.trim();
         const currentBoxElement = document.querySelector('.question-box.active');
-        currentBoxElement.classList.remove('active');
-        document.getElementById(nextId).classList.add('active');
+
+        if (inputVal === correctValue) {
+            currentBoxElement.classList.remove('active');
+            document.getElementById(nextId).classList.add('active');
+        } else {
+            alert("Неверный ответ!"); // Можно убрать, если алерт не нужен
+        }
     }
 
-    // Новая функция для эффекта мигания и перехода в вопросе про игру
+    // Функция для мигания экрана в вопросе про игру
     function triggerWhiteFlash(nextId) {
         const container = document.getElementById('mainContainer');
         const currentBoxElement = document.querySelector('.question-box.active');
 
-        // 1. Прячем текущий блок с вопросом
         container.style.opacity = '0';
 
         setTimeout(() => {
-            // 2. Вспышка черного, затем белого фона
             document.body.style.background = '#000000';
             setTimeout(() => {
-                document.body.style.background = '#ffffff'; // Белый экран
-                
-                // 3. Держим белый экран 0.5 секунды (500мс)
+                document.body.style.background = '#ffffff';
                 setTimeout(() => {
-                    // 4. Возвращаем фон
                     document.body.style.background = '#1e1e2f';
-                    
-                    // 5. Переходим к следующему вопросу
                     currentBoxElement.classList.remove('active');
                     document.getElementById(nextId).classList.add('active');
-                    
-                    // 6. Плавно возвращаем видимость контейнера
                     container.style.opacity = '1';
-                }, 500);
+                }, 500); // Белый экран 0.5 сек
             }, 80);
         }, 200);
     }

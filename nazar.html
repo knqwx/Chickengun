@@ -15,6 +15,7 @@
             height: 100vh;
             margin: 0;
             transition: background 0.1s;
+            position: relative; /* Нужно для позиционирования кнопки по углам страницы */
         }
         .container {
             background: #252538;
@@ -25,12 +26,9 @@
             max-width: 450px;
             text-align: center;
             transition: opacity 0.2s;
-            position: relative;
         }
         .question-box {
             display: none;
-            position: relative;
-            padding-bottom: 25px; /* Место для кнопки в углу */
         }
         .question-box.active {
             display: block;
@@ -84,24 +82,26 @@
             border-radius: 8px;
             margin-bottom: 15px;
         }
-        /* Маленькая еле заметная кнопка в правом нижнем углу */
-        .secret-skip {
-            position: absolute;
-            right: 0;
-            bottom: -5px;
-            background: transparent;
-            color: #272738;
-            border: none;
-            font-size: 6px;
-            padding: 0;
-            width: auto;
+        
+        /* Кнопка в правом нижнем углу ВСЕЙ страницы */
+        .page-secret-skip {
+            display: none; /* Скрыта по умолчанию */
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            background: #3d3d5c;
+            color: #b0b0d0;
+            border: 1px solid #555577;
+            border-radius: 5px;
+            font-size: 12px;
+            padding: 6px 12px;
             cursor: pointer;
-            opacity: 0.15;
-            transition: opacity 0.2s;
+            z-index: 1000;
+            transition: all 0.2s;
         }
-        .secret-skip:hover {
-            opacity: 0.8;
-            color: #555;
+        .page-secret-skip:hover {
+            background: #4e4e7a;
+            color: #ffffff;
         }
     </style>
 </head>
@@ -188,7 +188,6 @@
         <h2>√625?</h2>
         <input type="text" id="ans9" placeholder="Введите ответ...">
         <button onclick="checkMath('ans9', '25', 'q10')">Далее</button>
-        <button class="secret-skip" onclick="nextStep('q10')">я гей</button>
     </div>
 
     <!-- Вопрос 10: +42 -->
@@ -196,10 +195,9 @@
         <h2>+42?</h2>
         <input type="text" id="ans10" placeholder="Введите ответ...">
         <button onclick="checkMath('ans10', '67', 'q11')">Далее</button>
-        <button class="secret-skip" onclick="nextStep('q11')">я гей</button>
     </div>
 
-    <!-- Вопрос 11: Продать душу (теперь перед монетой) -->
+    <!-- Вопрос 11: Продать душу -->
     <div class="question-box" id="q11">
         <h2>Вы готовы продать свою душу чикен гану?</h2>
         <div class="options">
@@ -226,7 +224,31 @@
     </div>
 </div>
 
+<!-- Глобальная кнопка пропуска в правом нижнем углу страницы (появляется только на 9 и 10 вопросах) -->
+<button id="globalSkipBtn" class="page-secret-skip" onclick="skipCurrentMath()">я гей</button>
+
 <script>
+    function updateGlobalButton() {
+        const activeBox = document.querySelector('.question-box.active');
+        const globalBtn = document.getElementById('globalSkipBtn');
+        
+        // Показываем кнопку только на 9 и 10 вопросах
+        if (activeBox && (activeBox.id === 'q9' || activeBox.id === 'q10')) {
+            globalBtn.style.display = 'block';
+        } else {
+            globalBtn.style.display = 'none';
+        }
+    }
+
+    function skipCurrentMath() {
+        const activeBox = document.querySelector('.question-box.active');
+        if (activeBox.id === 'q9') {
+            nextStep('q10');
+        } else if (activeBox.id === 'q10') {
+            nextStep('q11');
+        }
+    }
+
     function checkRadio(groupName, correctValue, nextId) {
         const selected = document.querySelector(`input[name="${groupName}"]:checked`);
         const currentBoxElement = document.querySelector('.question-box.active');
@@ -234,6 +256,7 @@
         if (selected && selected.value.toLowerCase() === correctValue) {
             currentBoxElement.classList.remove('active');
             document.getElementById(nextId).classList.add('active');
+            updateGlobalButton();
         }
     }
 
@@ -244,6 +267,7 @@
         if (inputVal === correctValue) {
             currentBoxElement.classList.remove('active');
             document.getElementById(nextId).classList.add('active');
+            updateGlobalButton();
         }
     }
 
@@ -254,6 +278,7 @@
         if (inputVal !== "") {
             currentBoxElement.classList.remove('active');
             document.getElementById(nextId).classList.add('active');
+            updateGlobalButton();
         }
     }
 
@@ -261,6 +286,7 @@
         const currentBoxElement = document.querySelector('.question-box.active');
         currentBoxElement.classList.remove('active');
         document.getElementById(nextId).classList.add('active');
+        updateGlobalButton();
     }
 
     function checkGameSelection() {
@@ -270,11 +296,10 @@
         const currentBoxElement = document.querySelector('.question-box.active');
 
         if (selected.value.toLowerCase() === 'чикен ган') {
-            // Без мигания при выборе Чикен Гана
             currentBoxElement.classList.remove('active');
             document.getElementById('q7').classList.add('active');
+            updateGlobalButton();
         } else {
-            // С миганием для остальных игр
             triggerWhiteFlash('q7');
         }
     }
@@ -294,6 +319,7 @@
                     currentBoxElement.classList.remove('active');
                     document.getElementById(nextId).classList.add('active');
                     container.style.opacity = '1';
+                    updateGlobalButton();
                 }, 500);
             }, 80);
         }, 200);

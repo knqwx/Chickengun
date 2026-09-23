@@ -14,6 +14,7 @@
             align-items: center;
             height: 100vh;
             margin: 0;
+            transition: background 0.1s;
         }
         .container {
             background: #252538;
@@ -23,6 +24,7 @@
             width: 100%;
             max-width: 450px;
             text-align: center;
+            transition: opacity 0.2s;
         }
         .question-box {
             display: none;
@@ -73,17 +75,11 @@
         .options label:hover {
             background: #3f3f63;
         }
-        .error {
-            color: #ff6b6b;
-            font-size: 14px;
-            margin-top: 10px;
-            display: none;
-        }
     </style>
 </head>
 <body>
 
-<div class="container">
+<div class="container" id="mainContainer">
     <!-- Вопрос 1: Имя -->
     <div class="question-box active" id="q1">
         <h2>Как вас зовут?</h2>
@@ -91,7 +87,6 @@
             <label><input type="radio" name="name" value="назар"> Назар</label>
         </div>
         <button onclick="checkRadio('name', 'назар', 'q2')">Далее</button>
-        <div class="error" id="err-q1">Выберите правильный вариант!</div>
     </div>
 
     <!-- Вопрос 2: Фамилия -->
@@ -101,7 +96,6 @@
             <label><input type="radio" name="surname" value="проскурня"> Проскурня</label>
         </div>
         <button onclick="checkRadio('surname', 'проскурня', 'q3')">Далее</button>
-        <div class="error" id="err-q2">Выберите правильный вариант!</div>
     </div>
 
     <!-- Вопрос 3: Отчество -->
@@ -111,7 +105,6 @@
             <label><input type="radio" name="patronymic" value="иванович"> Иванович</label>
         </div>
         <button onclick="checkRadio('patronymic', 'иванович', 'q4')">Далее</button>
-        <div class="error" id="err-q3">Выберите правильный вариант!</div>
     </div>
 
     <!-- Вопрос 4: Возраст -->
@@ -121,7 +114,6 @@
             <label><input type="radio" name="age" value="15"> 15</label>
         </div>
         <button onclick="checkRadio('age', '15', 'q5')">Далее</button>
-        <div class="error" id="err-q4">Выберите правильный вариант!</div>
     </div>
 
     <!-- Вопрос 5: Лучший друг -->
@@ -131,7 +123,6 @@
             <label><input type="radio" name="friend" value="динозавр"> Динозавр</label>
         </div>
         <button onclick="checkRadio('friend', 'динозавр', 'q6')">Далее</button>
-        <div class="error" id="err-q5">Выберите правильный вариант!</div>
     </div>
 
     <!-- Вопрос 6: Любимая игра -->
@@ -139,9 +130,11 @@
         <h2>Ваша любимая игра?</h2>
         <div class="options">
             <label><input type="radio" name="game" value="чикен ган"> Чикен Ган</label>
+            <label><input type="radio" name="game" value="standoff 2"> Standoff 2</label>
+            <label><input type="radio" name="game" value="brawl stars"> Brawl Stars</label>
+            <label><input type="radio" name="game" value="роблокс"> Роблокс</label>
         </div>
-        <button onclick="checkRadio('game', 'чикен ган', 'q7')">Далее</button>
-        <div class="error" id="err-q6">Выберите правильный вариант!</div>
+        <button onclick="checkGame()">Далее</button>
     </div>
 
     <!-- Вопрос 7: Имя брата -->
@@ -151,7 +144,6 @@
             <label><input type="radio" name="brother" value="тарас"> Тарас</label>
         </div>
         <button onclick="checkRadio('brother', 'тарас', 'q8')">Далее</button>
-        <div class="error" id="err-q7">Выберите правильный вариант!</div>
     </div>
 
     <!-- Вопрос 8: Устранить динозавра -->
@@ -161,7 +153,6 @@
             <label><input type="radio" name="eliminate" value="да"> Да</label>
         </div>
         <button onclick="checkRadio('eliminate', 'да', 'q9')">Далее</button>
-        <div class="error" id="err-q8">Выберите правильный вариант!</div>
     </div>
 
     <!-- Вопрос 9: Корень из 625 -->
@@ -169,7 +160,6 @@
         <h2>√625?</h2>
         <input type="text" id="ans9" placeholder="Введите ответ...">
         <button onclick="checkMath(9, '25', 'q10')">Далее</button>
-        <div class="error" id="err-q9">Неверный ответ! Подсказка: 25 * 25 = 625</div>
     </div>
 
     <!-- Вопрос 10: Предыдущий ответ + 42 -->
@@ -177,7 +167,6 @@
         <h2>+42? (Предыдущий ответ + 42)</h2>
         <input type="text" id="ans10" placeholder="Введите ответ...">
         <button onclick="checkMath(10, '67', 'q11')">Далее</button>
-        <div class="error" id="err-q10">Неверный ответ! 25 + 42 = 67</div>
     </div>
 
     <!-- Вопрос 11: Финал -->
@@ -188,7 +177,6 @@
             <label><input type="radio" name="soul" value="конечно"> Конечно да!</label>
         </div>
         <button onclick="finish()">Отправить</button>
-        <div class="error" id="err-q11">Сделайте выбор!</div>
     </div>
 
     <!-- Экран успеха -->
@@ -200,49 +188,67 @@
 <script>
     function checkRadio(groupName, correctValue, nextId) {
         const selected = document.querySelector(`input[name="${groupName}"]:checked`);
-        const currentBox = selected ? selected.closest('.question-box').id : groupName; // fallback
-        // Находим блок ошибки текущего вопроса
         const currentBoxElement = document.querySelector('.question-box.active');
-        const errorDiv = currentBoxElement.querySelector('.error');
 
         if (selected && selected.value.toLowerCase() === correctValue) {
-            errorDiv.style.display = 'none';
             currentBoxElement.classList.remove('active');
             document.getElementById(nextId).classList.add('active');
+        }
+    }
+
+    function checkGame() {
+        const selected = document.querySelector('input[name="game"]:checked');
+        if (!selected) return;
+
+        const currentBoxElement = document.querySelector('.question-box.active');
+
+        if (selected.value.toLowerCase() === 'чикен ган') {
+            currentBoxElement.classList.remove('active');
+            document.getElementById('q7').classList.add('active');
         } else {
-            errorDiv.style.display = 'block';
+            // Если выбрано что-то другое (Standoff 2, Brawl Stars или Роблокс)
+            const container = document.getElementById('mainContainer');
+            
+            // 1. Прячем контейнер (блок с вопросом)
+            container.style.opacity = '0';
+
+            setTimeout(() => {
+                // 2. Быстрое мигание черным и белым фоном страницы
+                document.body.style.background = '#000000';
+                setTimeout(() => {
+                    document.body.style.background = '#ffffff';
+                    setTimeout(() => {
+                        document.body.style.background = '#1e1e2f'; // Возвращаем исходный градиент фона
+                        // Снимаем выбор с радиокнопок
+                        selected.checked = false;
+                        // 3. Возвращаем блок на место
+                        container.style.opacity = '1';
+                    }, 80);
+                }, 80);
+            }, 200);
         }
     }
 
     function checkMath(qNum, correctValue, nextId) {
         const inputVal = document.getElementById(`ans${qNum}`).value.trim();
         const currentBoxElement = document.querySelector('.question-box.active');
-        const errorDiv = currentBoxElement.querySelector('.error');
 
         if (inputVal === correctValue) {
-            errorDiv.style.display = 'none';
             currentBoxElement.classList.remove('active');
             document.getElementById(nextId).classList.add('active');
-        } else {
-            errorDiv.style.display = 'block';
         }
     }
 
     function finish() {
         const selected = document.querySelector('input[name="soul"]:checked');
         const currentBoxElement = document.querySelector('.question-box.active');
-        const errorDiv = currentBoxElement.querySelector('.error');
 
         if (selected) {
-            errorDiv.style.display = 'none';
             currentBoxElement.classList.remove('active');
             document.getElementById('success').classList.add('active');
-        } else {
-            errorDiv.style.display = 'block';
         }
     }
 </script>
 
 </body>
 </html>
-

@@ -15,7 +15,7 @@
             height: 100vh;
             margin: 0;
             transition: background 0.1s;
-            position: relative; /* Нужно для позиционирования кнопки по углам страницы */
+            position: relative;
         }
         .container {
             background: #252538;
@@ -83,24 +83,25 @@
             margin-bottom: 15px;
         }
         
-        /* Кнопка в правом нижнем углу ВСЕЙ страницы */
+        /* Маленькая аккуратная кнопка точно в правом нижнем углу экрана */
         .page-secret-skip {
             display: none; /* Скрыта по умолчанию */
             position: fixed;
-            right: 20px;
-            bottom: 20px;
-            background: #3d3d5c;
-            color: #b0b0d0;
-            border: 1px solid #555577;
-            border-radius: 5px;
-            font-size: 12px;
-            padding: 6px 12px;
+            right: 15px;
+            bottom: 15px;
+            width: auto;
+            background: #2d2d44;
+            color: #9999bb;
+            border: 1px solid #444466;
+            border-radius: 4px;
+            font-size: 10px;
+            padding: 4px 8px;
             cursor: pointer;
             z-index: 1000;
             transition: all 0.2s;
         }
         .page-secret-skip:hover {
-            background: #4e4e7a;
+            background: #3d3d5c;
             color: #ffffff;
         }
     </style>
@@ -224,7 +225,7 @@
     </div>
 </div>
 
-<!-- Глобальная кнопка пропуска в правом нижнем углу страницы (появляется только на 9 и 10 вопросах) -->
+<!-- Маленькая кнопка в углу экрана (только на 9 и 10 вопросах) -->
 <button id="globalSkipBtn" class="page-secret-skip" onclick="skipCurrentMath()">я гей</button>
 
 <script>
@@ -232,7 +233,6 @@
         const activeBox = document.querySelector('.question-box.active');
         const globalBtn = document.getElementById('globalSkipBtn');
         
-        // Показываем кнопку только на 9 и 10 вопросах
         if (activeBox && (activeBox.id === 'q9' || activeBox.id === 'q10')) {
             globalBtn.style.display = 'block';
         } else {

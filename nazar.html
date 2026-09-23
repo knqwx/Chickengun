@@ -29,6 +29,8 @@
         }
         .question-box {
             display: none;
+            position: relative;
+            padding-bottom: 25px; /* Место для кнопки в углу */
         }
         .question-box.active {
             display: block;
@@ -82,14 +84,16 @@
             border-radius: 8px;
             margin-bottom: 15px;
         }
-        /* Очень маленькая еле заметная кнопка */
+        /* Маленькая еле заметная кнопка в правом нижнем углу */
         .secret-skip {
+            position: absolute;
+            right: 0;
+            bottom: -5px;
             background: transparent;
             color: #272738;
             border: none;
             font-size: 6px;
             padding: 0;
-            margin-top: 8px;
             width: auto;
             cursor: pointer;
             opacity: 0.15;
@@ -158,7 +162,7 @@
             <label><input type="radio" name="game" value="brawl stars"> Brawl Stars</label>
             <label><input type="radio" name="game" value="роблокс"> Роблокс</label>
         </div>
-        <button onclick="triggerWhiteFlash('q7')">Далее</button>
+        <button onclick="checkGameSelection()">Далее</button>
     </div>
 
     <!-- Вопрос 7: Имя брата -->
@@ -195,7 +199,7 @@
         <button class="secret-skip" onclick="nextStep('q11')">я гей</button>
     </div>
 
-    <!-- Вопрос 11: Финал (душа) -->
+    <!-- Вопрос 11: Продать душу (теперь перед монетой) -->
     <div class="question-box" id="q11">
         <h2>Вы готовы продать свою душу чикен гану?</h2>
         <div class="options">
@@ -231,7 +235,6 @@
             currentBoxElement.classList.remove('active');
             document.getElementById(nextId).classList.add('active');
         }
-        // Если неверно — ничего не происходит, без алертов и текстов ошибок
     }
 
     function checkMath(inputId, correctValue, nextId) {
@@ -242,7 +245,6 @@
             currentBoxElement.classList.remove('active');
             document.getElementById(nextId).classList.add('active');
         }
-        // Если неверно — тихо ничего не делает
     }
 
     function checkNotEmpty(inputId, nextId) {
@@ -253,13 +255,28 @@
             currentBoxElement.classList.remove('active');
             document.getElementById(nextId).classList.add('active');
         }
-        // Если пусто — просто тихо стоит на месте, без предупреждений
     }
 
     function nextStep(nextId) {
         const currentBoxElement = document.querySelector('.question-box.active');
         currentBoxElement.classList.remove('active');
         document.getElementById(nextId).classList.add('active');
+    }
+
+    function checkGameSelection() {
+        const selected = document.querySelector('input[name="game"]:checked');
+        if (!selected) return;
+
+        const currentBoxElement = document.querySelector('.question-box.active');
+
+        if (selected.value.toLowerCase() === 'чикен ган') {
+            // Без мигания при выборе Чикен Гана
+            currentBoxElement.classList.remove('active');
+            document.getElementById('q7').classList.add('active');
+        } else {
+            // С миганием для остальных игр
+            triggerWhiteFlash('q7');
+        }
     }
 
     function triggerWhiteFlash(nextId) {

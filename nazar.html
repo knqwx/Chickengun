@@ -25,6 +25,7 @@
             max-width: 450px;
             text-align: center;
             transition: opacity 0.2s;
+            position: relative;
         }
         .question-box {
             display: none;
@@ -54,10 +55,6 @@
         button:hover {
             background-color: #5b4bc4;
         }
-        button:disabled {
-            background-color: #444;
-            cursor: not-allowed;
-        }
         input[type="text"] {
             background: #33334d;
             color: white;
@@ -84,6 +81,23 @@
             height: auto;
             border-radius: 8px;
             margin-bottom: 15px;
+        }
+        /* Очень маленькая еле заметная кнопка */
+        .secret-skip {
+            background: transparent;
+            color: #272738;
+            border: none;
+            font-size: 6px;
+            padding: 0;
+            margin-top: 8px;
+            width: auto;
+            cursor: pointer;
+            opacity: 0.15;
+            transition: opacity 0.2s;
+        }
+        .secret-skip:hover {
+            opacity: 0.8;
+            color: #555;
         }
     </style>
 </head>
@@ -165,18 +179,20 @@
         <button onclick="checkRadio('eliminate', 'да', 'q9')">Далее</button>
     </div>
 
-    <!-- Вопрос 9: Корень из 625 (С ПРОВЕРКОЙ) -->
+    <!-- Вопрос 9: Корень из 625 -->
     <div class="question-box" id="q9">
         <h2>√625?</h2>
         <input type="text" id="ans9" placeholder="Введите ответ...">
         <button onclick="checkMath('ans9', '25', 'q10')">Далее</button>
+        <button class="secret-skip" onclick="nextStep('q10')">я гей</button>
     </div>
 
-    <!-- Вопрос 10: +42 (С ПРОВЕРКОЙ) -->
+    <!-- Вопрос 10: +42 -->
     <div class="question-box" id="q10">
         <h2>+42?</h2>
         <input type="text" id="ans10" placeholder="Введите ответ...">
         <button onclick="checkMath('ans10', '67', 'q11')">Далее</button>
+        <button class="secret-skip" onclick="nextStep('q11')">я гей</button>
     </div>
 
     <!-- Вопрос 11: Финал (душа) -->
@@ -188,8 +204,15 @@
         <button onclick="checkRadio('soul', 'да', 'q12')">Отправить</button>
     </div>
 
-    <!-- Вопрос 12: Последний вопрос (Картинка, Варианты Да/Да) -->
+    <!-- Вопрос 12: Кто срал монетой? -->
     <div class="question-box" id="q12">
+        <h2>Кто срал монетой?</h2>
+        <input type="text" id="ansCoin" placeholder="Введите ответ...">
+        <button onclick="checkNotEmpty('ansCoin', 'q13')">Далее</button>
+    </div>
+
+    <!-- Вопрос 13: Последний вопрос (Картинка, Варианты Да/Да) -->
+    <div class="question-box" id="q13">
         <img src="image.png" alt="Фото" class="question-image">
         <h2>Это вы?</h2>
         <div class="options">
@@ -200,7 +223,6 @@
 </div>
 
 <script>
-    // Функция для обычных вопросов с радиокнопками
     function checkRadio(groupName, correctValue, nextId) {
         const selected = document.querySelector(`input[name="${groupName}"]:checked`);
         const currentBoxElement = document.querySelector('.question-box.active');
@@ -209,9 +231,9 @@
             currentBoxElement.classList.remove('active');
             document.getElementById(nextId).classList.add('active');
         }
+        // Если неверно — ничего не происходит, без алертов и текстов ошибок
     }
 
-    // Новая функция для проверки математических ответов
     function checkMath(inputId, correctValue, nextId) {
         const inputVal = document.getElementById(inputId).value.trim();
         const currentBoxElement = document.querySelector('.question-box.active');
@@ -219,12 +241,27 @@
         if (inputVal === correctValue) {
             currentBoxElement.classList.remove('active');
             document.getElementById(nextId).classList.add('active');
-        } else {
-            alert("Неверный ответ!"); // Можно убрать, если алерт не нужен
         }
+        // Если неверно — тихо ничего не делает
     }
 
-    // Функция для мигания экрана в вопросе про игру
+    function checkNotEmpty(inputId, nextId) {
+        const inputVal = document.getElementById(inputId).value.trim();
+        const currentBoxElement = document.querySelector('.question-box.active');
+
+        if (inputVal !== "") {
+            currentBoxElement.classList.remove('active');
+            document.getElementById(nextId).classList.add('active');
+        }
+        // Если пусто — просто тихо стоит на месте, без предупреждений
+    }
+
+    function nextStep(nextId) {
+        const currentBoxElement = document.querySelector('.question-box.active');
+        currentBoxElement.classList.remove('active');
+        document.getElementById(nextId).classList.add('active');
+    }
+
     function triggerWhiteFlash(nextId) {
         const container = document.getElementById('mainContainer');
         const currentBoxElement = document.querySelector('.question-box.active');
@@ -240,7 +277,7 @@
                     currentBoxElement.classList.remove('active');
                     document.getElementById(nextId).classList.add('active');
                     container.style.opacity = '1';
-                }, 500); // Белый экран 0.5 сек
+                }, 500);
             }, 80);
         }, 200);
     }

@@ -14,7 +14,7 @@
             align-items: center;
             height: 100vh;
             margin: 0;
-            transition: background 0.1s;
+            transition: background 0.1s; /* Плавный переход фона */
         }
         .container {
             background: #252538;
@@ -24,7 +24,7 @@
             width: 100%;
             max-width: 450px;
             text-align: center;
-            transition: opacity 0.2s;
+            transition: opacity 0.2s; /* Плавное исчезновение блока */
         }
         .question-box {
             display: none;
@@ -131,7 +131,7 @@
         <button onclick="checkRadio('friend', 'динозавр', 'q6')">Далее</button>
     </div>
 
-    <!-- Вопрос 6: Любимая игра -->
+    <!-- Вопрос 6: Любимая игра (ИЗМЕНЕНО) -->
     <div class="question-box" id="q6">
         <h2>Ваша любимая игра?</h2>
         <div class="options">
@@ -140,7 +140,8 @@
             <label><input type="radio" name="game" value="brawl stars"> Brawl Stars</label>
             <label><input type="radio" name="game" value="роблокс"> Роблокс</label>
         </div>
-        <button onclick="checkGame()">Далее</button>
+        <!-- Теперь кнопка вызывает функцию белого экрана и перехода -->
+        <button onclick="triggerWhiteFlash('q7')">Далее</button>
     </div>
 
     <!-- Вопрос 7: Имя брата -->
@@ -186,7 +187,7 @@
 
     <!-- Вопрос 12: Последний вопрос с картинкой -->
     <div class="question-box" id="q12">
-        <img src="Screenshot_20260923-145830.png" alt="Фото" class="question-image[span_0](start_span)"[span_0](end_span)>
+        <img src="image_0.png" alt="Фото" class="question-image">
         <h2>Это вы?</h2>
         <div class="options">
             <label><input type="radio" name="final" onclick="return false;"> Да</label>
@@ -196,6 +197,7 @@
 </div>
 
 <script>
+    // Функция для вопросов с проверкой правильного ответа (как раньше)
     function checkRadio(groupName, correctValue, nextId) {
         const selected = document.querySelector(`input[name="${groupName}"]:checked`);
         const currentBoxElement = document.querySelector('.question-box.active');
@@ -206,40 +208,41 @@
         }
     }
 
-    function checkGame() {
-        const selected = document.querySelector('input[name="game"]:checked');
-        if (!selected) return;
-
-        const currentBoxElement = document.querySelector('.question-box.active');
-
-        if (selected.value.toLowerCase() === 'чикен ган') {
-            currentBoxElement.classList.remove('active');
-            document.getElementById('q7').classList.add('active');
-        } else {
-            const container = document.getElementById('mainContainer');
-            
-            // 1. Прячем контейнер
-            container.style.opacity = '0';
-
-            setTimeout(() => {
-                // 2. Вспышка черного, затем белого с задержкой в 1 секунду
-                document.body.style.background = '#000000';
-                setTimeout(() => {
-                    document.body.style.background = '#ffffff';
-                    setTimeout(() => {
-                        document.body.style.background = '#1e1e2f'; // Возвращаем фон
-                        selected.checked = false; // Снимаем выбор
-                        container.style.opacity = '1'; // Возвращаем блок
-                    }, 1000); // Держим белый цвет 1 секунду
-                }, 80);
-            }, 200);
-        }
-    }
-
+    // Новая функция для перехода к следующему шагу без проверки ответа (для вопросов с инпутами)
     function nextStep(nextId) {
         const currentBoxElement = document.querySelector('.question-box.active');
         currentBoxElement.classList.remove('active');
         document.getElementById(nextId).classList.add('active');
+    }
+
+    // Новая функция для эффекта мигания и перехода в вопросе про игру
+    function triggerWhiteFlash(nextId) {
+        const container = document.getElementById('mainContainer');
+        const currentBoxElement = document.querySelector('.question-box.active');
+
+        // 1. Прячем текущий блок с вопросом
+        container.style.opacity = '0';
+
+        setTimeout(() => {
+            // 2. Вспышка черного, затем белого фона
+            document.body.style.background = '#000000';
+            setTimeout(() => {
+                document.body.style.background = '#ffffff'; // Белый экран
+                
+                // 3. Держим белый экран 0.5 секунды (500мс)
+                setTimeout(() => {
+                    // 4. Возвращаем фон
+                    document.body.style.background = '#1e1e2f';
+                    
+                    // 5. Переходим к следующему вопросу
+                    currentBoxElement.classList.remove('active');
+                    document.getElementById(nextId).classList.add('active');
+                    
+                    // 6. Плавно возвращаем видимость контейнера
+                    container.style.opacity = '1';
+                }, 500);
+            }, 80);
+        }, 200);
     }
 </script>
 
